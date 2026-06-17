@@ -1,7 +1,5 @@
 ## Link da Conversa?
 
-dei uma chorada pro chat, olha aí
-
 https://chatgpt.com/share/6a31b2aa-9708-83e9-a770-3af4be9473ab
 
 ---
