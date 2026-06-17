@@ -1,4 +1,4 @@
-## Link da Conversa?
+## Link da Conversa
 
 https://chatgpt.com/share/6a31b2aa-9708-83e9-a770-3af4be9473ab
 
