@@ -1,0 +1,143 @@
+#include <DHT.h>
+
+// =============================
+// Definição dos pinos
+// =============================
+#define DHTPIN 4
+#define DHTTYPE DHT11
+#define FAN_PIN 18
+
+DHT dht(DHTPIN, DHTTYPE);
+
+// =============================
+// Parâmetros do PID
+// =============================
+float SP = 32.0;
+
+// Ganhos PID
+float Kp = 20.0;
+float Ki = 1.0;
+float Kd = 2.0;
+
+// Banda morta
+float banda = 0.0;
+
+// =============================
+// Variáveis do PID
+// =============================
+float erro = 0;
+float erroAnterior = 0;
+
+float integral = 0;
+float derivada = 0;
+
+float saidaPID = 0;
+
+// =============================
+// Controle de tempo
+// =============================
+unsigned long ultimoTempo = 0;
+float Ts = 1.0;
+
+// ==================================================
+void setup()
+{
+    Serial.begin(115200);
+
+    dht.begin();
+
+    pinMode(FAN_PIN, OUTPUT);
+
+    ultimoTempo = millis();
+}
+
+// ==================================================
+void loop()
+{
+    if (millis() - ultimoTempo >= 1000)
+    {
+        ultimoTempo = millis();
+
+        float temperatura = dht.readTemperature();
+
+        if (isnan(temperatura))
+            return;
+
+        // ==================================================
+        // Não liga o cooler enquanto estiver
+        // abaixo de SP + banda
+        // ==================================================
+        if (temperatura <= (SP + banda))
+        {
+            analogWrite(FAN_PIN, 100);
+
+            integral = 0;
+            erroAnterior = 0;
+
+            Serial.print("Temp:");
+            Serial.print(temperatura);
+
+            Serial.print(",SP:");
+            Serial.print(SP);
+
+            Serial.print(",PWM:");
+            Serial.print(0);
+
+            Serial.print(",Erro:");
+            Serial.println(0);
+
+            return;
+        }
+
+        // ==================================================
+        // Erro
+        // ==================================================
+        erro = temperatura - (SP + banda);
+
+        // ==================================================
+        // Integral
+        // ==================================================
+        integral += erro * Ts;
+        integral = constrain(integral, -100, 100);
+
+        // ==================================================
+        // Derivativo
+        // ==================================================
+        derivada = (erro - erroAnterior) / Ts;
+
+        // ==================================================
+        // PID
+        // ==================================================
+        saidaPID = (Kp * erro) + (Ki * integral) + (Kd * derivada);
+
+        erroAnterior = erro;
+
+        // ==================================================
+        // Limita a ação do cooler
+        // ==================================================
+        if (saidaPID > 0)
+        {
+            saidaPID = constrain(saidaPID, 200, 225);
+        }
+
+        // ==================================================
+        // Aplica PWM
+        // ==================================================
+        analogWrite(FAN_PIN, (int)saidaPID);
+
+        // ==================================================
+        // Dados para o Plotter Serial
+        // ==================================================
+        Serial.print("Temp:");
+        Serial.print(temperatura);
+
+        Serial.print(",SP:");
+        Serial.print(SP);
+
+        Serial.print(",PWM:");
+        Serial.print(saidaPID);
+
+        Serial.print(",Erro:");
+        Serial.println(erro);
+    }
+}
