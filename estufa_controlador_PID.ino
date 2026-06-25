@@ -1,4 +1,4 @@
-// Biblioteca para comunicar com o sensor DHT11
+// Biblioteca para comunicar com o sensor DHT11.
 #include <DHT.h>
 
 // Definição dos pinos
