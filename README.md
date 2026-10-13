@@ -118,8 +118,6 @@ Developed as part of an **Embedded Systems course** at **IFPR — Instituto Fede
 - Kawan Dias
 - Salomão Gabriel
 
-**GitHub Repository:** [KawanDias/sistemas-embarcados](https://github.com/KawanDias/sistemas-embarcados)
-
 ---
 
 *Applying embedded programming, control theory, and electronics to automated greenhouse temperature regulation.*
